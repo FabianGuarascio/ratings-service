@@ -1,5 +1,5 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { ClientKafka } from '@nestjs/microservices';
+import { ClientKafka, RpcException } from '@nestjs/microservices';
 import { PrismaService } from '../prisma.service';
 import { CreateRatingDto } from './dto/create-rating.dto';
 import { UpdateRatingDto } from './dto/update-rating.dto';
@@ -29,8 +29,14 @@ export class RatingsService implements OnModuleInit {
     return this.prisma.rating.findMany();
   }
 
-  findOne(id: number) {
-    return this.prisma.rating.findUnique({ where: { id } });
+  async findOne(id: number) {
+    const rating = await this.prisma.rating.findUnique({ where: { id } });
+    if (!rating)
+      throw new RpcException({
+        statusCode: 404,
+        message: `Rating #${id} not found`,
+      });
+    return rating;
   }
 
   update(id: number, updateRatingDto: UpdateRatingDto) {
