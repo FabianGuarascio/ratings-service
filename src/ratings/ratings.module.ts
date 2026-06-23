@@ -12,7 +12,7 @@ import { PrismaService } from '../prisma.service';
         transport: Transport.KAFKA,
         options: {
           client: {
-            clientId: 'ratings-service-producer',
+            clientId: process.env.KAFKA_CLIENT_ID ?? 'ratings-service-producer',
             brokers: (process.env.KAFKA_BROKERS ?? 'localhost:9092').split(','),
           },
         },
