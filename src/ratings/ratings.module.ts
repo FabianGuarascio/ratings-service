@@ -13,7 +13,7 @@ import { PrismaService } from '../prisma.service';
         options: {
           client: {
             clientId: 'ratings-service-producer',
-            brokers: ['localhost:9092'],
+            brokers: (process.env.KAFKA_BROKERS ?? 'localhost:9092').split(','),
           },
         },
       },
