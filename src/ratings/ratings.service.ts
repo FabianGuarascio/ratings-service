@@ -1,28 +1,15 @@
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { ClientKafka, RpcException } from '@nestjs/microservices';
+import { Injectable } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 import { PrismaService } from '../prisma.service';
 import { CreateRatingDto } from './dto/create-rating.dto';
 import { UpdateRatingDto } from './dto/update-rating.dto';
 
 @Injectable()
-export class RatingsService implements OnModuleInit {
-  constructor(
-    private readonly prisma: PrismaService,
-    @Inject('KAFKA_CLIENT')
-    private readonly kafkaClient: ClientKafka,
-  ) {}
-
-  async onModuleInit() {
-    await this.kafkaClient.connect();
-  }
+export class RatingsService {
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(createRatingDto: CreateRatingDto) {
-    const rating = await this.prisma.rating.create({ data: createRatingDto });
-    this.kafkaClient.emit('rating.added', {
-      movieId: rating.movieId,
-      score: rating.score,
-    });
-    return rating;
+    return this.prisma.rating.create({ data: createRatingDto });
   }
 
   findAll() {
